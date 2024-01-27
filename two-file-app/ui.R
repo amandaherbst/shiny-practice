@@ -6,7 +6,18 @@ ui <- navbarPage(
   # (Page 1) intro tabPanel ----
   tabPanel(title = "About this Page",
            
-           "background info goes here"
+           # intro text fluidRow ----
+           fluidRow(
+             
+             column(1),
+             column(10, includeMarkdown("text/about.md")),
+             column(1)
+             
+           ), # END intro text fluidRow
+           
+           hr(), # add horizontal line for footer underneath
+           
+           includeMarkdown("text/footer.md")
            
   ), # END (Page 1) intro tabPanel
   
@@ -48,7 +59,8 @@ ui <- navbarPage(
                         mainPanel(
                           
                           # trout scatterplot output ----
-                          plotOutput(outputId = "trout_scatterplot_output")
+                          plotOutput(outputId = "trout_scatterplot_output") %>% 
+                            withSpinner(color = "magenta", type = 1)
                           
                         ) # END trout mainPanel
                         
@@ -65,18 +77,30 @@ ui <- navbarPage(
                         # penguin sidebarPanel ----
                         sidebarPanel(
                           
-                          "penguin inputs will live here"
+                          pickerInput(inputId = "islands_input",
+                                      label = "Select island(s)",
+                                      choices = unique(penguins$island),
+                                      selected = c("Dream"),
+                                      options = pickerOptions(actionsBox = TRUE),
+                                      multiple = TRUE),
+                          
+                          sliderInput(inputId = "penguin_slider_input",
+                                      label = "Select number of bins",
+                                      min = 1,
+                                      max = 100,
+                                      value = 25)
                           
                         ), # END penguin sidebarPanel
                         
                         # penguin mainPanel ----
                         mainPanel(
                           
-                          "this is where penguin outputs will live"
+                          plotOutput(outputId = "penguin_histogram_output") %>% 
+                            withSpinner(color = "forestgreen", type = 4, size = 2)
                           
                         ) # END penguin mainPanel
                         
-                      ) # END penguin side
+                      ) # END penguin sidebarLayout
                       
              ) # END penguin tabPanel
              

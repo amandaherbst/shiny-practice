@@ -4,6 +4,11 @@ server <- function(input, output) {
   # filter trout data ----
   trout_filtered_df <- reactive({
     
+    validate(
+      need(length(input$channel_type_input) > 0, "Please select at least one channel type to visualize data"),
+      need(length(input$section_input) > 0, "Please select at least one section (clear cut forest or old growth forest).")
+    )
+    
     clean_trout |> 
       filter(channel_type %in% c(input$channel_type_input)) %>% 
       filter(section %in% c(input$section_input))
@@ -24,6 +29,29 @@ server <- function(input, output) {
       labs(x = "Trout Length (mm)", y = "Trout Weight (g)", color = "Channel Type", shape = "Channel Type") +
       myCustomTheme()
     
-  }) # END trout renderPlot
+  },
+  
+  alt = "This is my alt text and it's not very good right now but will improve later"
+  
+  ) # END trout renderPlot
+  
+  # filter penguin data for island ----
+  island_df <- reactive({
+    penguins %>%
+      filter(island %in% c(input$islands_input))
+  }) # END filtered penguin data
+  
+  # penguin histogram ----
+  output$penguin_histogram_output <- renderPlot({
+    
+    ggplot(na.omit(island_df()), aes(x = flipper_length_mm, fill = species)) +
+      geom_histogram(alpha = 0.6, position = "identity", bins = input$penguin_slider_input) +
+      scale_fill_manual(values = c("Adelie" = "#FEA346", "Chinstrap" = "#B251F1", "Gentoo" = "#4BA4A4")) +
+      labs(x = "Flipper length (mm)", y = "Frequency",
+           fill = "Penguin species") +
+      myCustomTheme()
+    
+  }) # END penguin histogram render
+  
   
 } # END server function
